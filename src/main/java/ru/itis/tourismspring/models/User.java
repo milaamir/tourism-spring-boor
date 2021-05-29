@@ -1,0 +1,60 @@
+package ru.itis.tourismspring.models;
+
+import lombok.*;
+
+import java.util.List;
+
+import javax.persistence.*;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "account")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String firstName;
+
+    private String lastName;
+
+    @Column(unique = true)
+    private String email;
+
+    private String hashPassword;
+
+    @Enumerated(value = EnumType.STRING)
+    private State state;
+
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
+
+    public enum State {
+        ACTIVE, BANNED
+    }
+
+    public enum Role {
+        USER, ADMIN
+    }
+
+    public boolean isActive() {
+        return this.state == State.ACTIVE;
+    }
+
+    public boolean isBanned() {
+        return this.state == State.BANNED;
+    }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
+
+    @ManyToMany
+    @JoinTable(name = "user_tour",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "tour_id", referencedColumnName = "id")})
+    private List<Tour> tours;
+}
